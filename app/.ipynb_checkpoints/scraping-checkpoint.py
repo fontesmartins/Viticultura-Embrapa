@@ -1,14 +1,19 @@
+import os
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import time
+import chromedriver_autoinstaller
 
 # Função para configurar o driver com opções para melhorar o carregamento
 def setup_driver():
+    # Baixar e configurar o ChromeDriver, se necessário
+    chromedriver_autoinstaller.install()
+
     options = Options()
     options.add_argument("--disable-extensions")
     options.add_argument("--headless")  # Roda em modo headless
@@ -18,9 +23,13 @@ def setup_driver():
     options.add_argument("--disable-logging")
     options.add_argument("--disable-images")  # Desabilita as imagens
     
+    # Se estiver no Heroku, o Chrome pode estar instalado em um local específico
+    options.binary_location = os.environ.get("GOOGLE_CHROME_BIN", "/app/.apt/usr/bin/google-chrome")
+
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(10)  # Adiciona um tempo de espera implícita para os elementos
     return driver
+
 
 # Função para fazer o scraping
 def get_producao_scraping():
